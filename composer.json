@@ -1,0 +1,29 @@
+{
+  "name": "commty/simple-framework",
+  "description": "Very Simple framework for very complex projects",
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Happensit",
+      "email": "hello@happensit.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.6.4",
+    "symfony/http-foundation": "~3.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "Commty\\Simple\\": "src/"
+    }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "~5.7",
+    "mockery/mockery": "~0.9"
+  },
+  "suggest": {
+    "vlucas/phpdotenv": "Required to use .env files (~2.2)."
+  }
+}
