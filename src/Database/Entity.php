@@ -42,24 +42,5 @@ abstract class Entity implements EntityInterface
             $name,
             $getter
         ));
-
-    }
-
-    /**
-     * Magic setter
-     * @param $name
-     * @param $value
-     * @return mixed
-     */
-    public function __set($name, $value)
-    {
-        $setter = 'set' . str_replace('_', '', ucwords($name, '_'));
-
-        if (is_callable([$this, $setter])) {
-            $this->{$setter}($value);
-
-            return;
-        }
-
     }
 }

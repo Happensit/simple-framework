@@ -3,8 +3,6 @@
 namespace Commty\Simple\Database;
 
 use Commty\Simple\Exception\ConfigureApplicationException;
-use Commty\Simple\Exception\NotFoundHttpException;
-use MongoDB\BSON\Persistable;
 
 /**
  * Class Repository

@@ -5,7 +5,6 @@ namespace Commty\Simple\Http;
 use Commty\Simple\Di\Container;
 use Commty\Simple\Exception\BadMethodCallException;
 use Commty\Simple\Exception\NotFoundHttpException;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class Router

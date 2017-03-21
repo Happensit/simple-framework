@@ -3,7 +3,6 @@
 namespace Commty\Simple\Http;
 
 use Commty\Simple\EventDispatcher\Event;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class ResponseEvent

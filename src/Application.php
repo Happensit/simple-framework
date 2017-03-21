@@ -8,11 +8,11 @@ use Commty\Simple\EventDispatcher\EventSubscriberInterface;
 use Commty\Simple\Exception\ConfigureApplicationException;
 use Commty\Simple\Handler\ApplicationEventHandler;
 use Commty\Simple\Http\HttpEvent;
+use Commty\Simple\Http\Request;
+use Commty\Simple\Http\Response;
 use Commty\Simple\Http\ResponseEvent;
 use Commty\Simple\Http\Router;
 use Commty\Simple\ServiceProvider\ServiceProviderInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class Application
@@ -90,6 +90,7 @@ class Application
         }
         $this->container->setInstance(Request::class, $request);
         $response = $this->router->math($request);
+
         if ($response instanceof Response) {
             $this->dispatcher->dispatch(
                 ApplicationEventHandler::ENDAPPLICATION,
