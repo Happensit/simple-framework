@@ -59,7 +59,7 @@ class Container implements ContainerInterface
     {
         $dependencies = [];
 
-        if ($reflection instanceof \ReflectionFunctionAbstract ) {
+        if ($reflection instanceof \ReflectionFunctionAbstract) {
             foreach ($reflection->getParameters() as $param) {
                 if ($param->isDefaultValueAvailable()) {
                     $dependencies[] = $param->getDefaultValue();
@@ -76,11 +76,22 @@ class Container implements ContainerInterface
     }
 
     /**
+     * Register an existing instance as shared in the container.
+     * @param $class
+     * @param $instance
+     */
+    public function setInstance($class, $instance)
+    {
+        unset($this->classes[$class]);
+        $this->classes[$class] = $instance;
+    }
+
+    /**
      * @param $class
      * @param array $definition
      * @return object
      */
-    public function set($class, $definition = [])
+    public function setClass($class, $definition = [])
     {
         if (empty($definition)) {
             return $this->getClass($class);

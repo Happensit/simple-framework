@@ -4,6 +4,7 @@ namespace Commty\Simple\Handler;
 
 use Commty\Simple\EventDispatcher\EventSubscriberInterface;
 use Commty\Simple\Http\HttpEvent;
+use Commty\Simple\Http\ResponseEvent;
 
 /**
  * Class ApplicationEventHandler
@@ -12,7 +13,8 @@ use Commty\Simple\Http\HttpEvent;
 class ApplicationEventHandler implements EventSubscriberInterface
 {
 
-    const ENDAPPLICATION = 'kernel.onEnd';
+    const ENDAPPLICATION = 'kernel.onKernelResponse';
+    const EXCEPTION = 'kernel.onKernelException';
 
     /**
      * @return array
@@ -20,7 +22,8 @@ class ApplicationEventHandler implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            self::ENDAPPLICATION => 'onKernelEnd'
+            self::EXCEPTION => 'onKernelException',
+            self::ENDAPPLICATION => 'onKernelResponse'
         ];
     }
 
@@ -28,8 +31,18 @@ class ApplicationEventHandler implements EventSubscriberInterface
      * @param HttpEvent $event
      * @return mixed
      */
-    public function onKernelEnd(HttpEvent $event)
+    public function onKernelException(HttpEvent $event)
     {
-        return;
+        $response = call_user_func($event->getErrorCallback(), $event->getException());
+        return $this->onKernelResponse(new ResponseEvent($response));
+    }
+
+    /**
+     * @param ResponseEvent $event
+     * @return mixed
+     */
+    public function onKernelResponse(ResponseEvent $event)
+    {
+        return $event->getResponse()->send();
     }
 }

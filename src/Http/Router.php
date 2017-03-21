@@ -5,6 +5,7 @@ namespace Commty\Simple\Http;
 use Commty\Simple\Di\Container;
 use Commty\Simple\Exception\BadMethodCallException;
 use Commty\Simple\Exception\NotFoundHttpException;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class Router
@@ -35,8 +36,8 @@ class Router
     /**
      * Register a route with the application.
      *
-     * @param  string  $uri
-     * @param  mixed  $action
+     * @param  string $uri
+     * @param  mixed $action
      */
     public function post($uri, $action)
     {
@@ -46,8 +47,8 @@ class Router
     /**
      * Register a route with the application.
      *
-     * @param  string  $uri
-     * @param  mixed  $action
+     * @param  string $uri
+     * @param  mixed $action
      */
     public function put($uri, $action)
     {
@@ -57,8 +58,8 @@ class Router
     /**
      * Register a route with the application.
      *
-     * @param  string  $uri
-     * @param  mixed  $action
+     * @param  string $uri
+     * @param  mixed $action
      */
     public function patch($uri, $action)
     {
@@ -68,8 +69,8 @@ class Router
     /**
      * Register a route with the application.
      *
-     * @param  string  $uri
-     * @param  mixed  $action
+     * @param  string $uri
+     * @param  mixed $action
      */
     public function delete($uri, $action)
     {
@@ -79,8 +80,8 @@ class Router
     /**
      * Register a route with the application.
      *
-     * @param  string  $uri
-     * @param  mixed  $action
+     * @param  string $uri
+     * @param  mixed $action
      */
     public function options($uri, $action)
     {
@@ -137,27 +138,24 @@ class Router
         $requestUri = $request->getRequestUri();
 
         foreach ($this->routes[$request->getMethod()] as $route) {
-
             if (preg_match($route['path'], $requestUri, $params)) {
                 $params = array_slice($params, 1);
                 $callback = $route['callback'];
 
                 if (is_callable($callback)) {
-                    $result = call_user_func_array($callback, $params);
+                    return call_user_func_array($callback, $params);
                 } elseif (stripos($callback, '@') !== false) {
                     list($controller, $method) = explode('@', $callback);
                     $controller = Container::getInstance()->getClass($controller);
                     $dependencies = Container::getInstance()->getDependencies(
                         new \ReflectionMethod($controller, $method)
                     );
-                    $result = call_user_func_array([$controller, $method], array_merge($dependencies, $params));
-                }
 
-                return print $result;
+                    return call_user_func_array([$controller, $method], array_merge($dependencies, $params));
+                }
             }
         }
 
         throw new NotFoundHttpException(sprintf("Route %s Not found", $requestUri));
-
     }
 }

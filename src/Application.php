@@ -7,11 +7,12 @@ use Commty\Simple\EventDispatcher\EventDispatcher;
 use Commty\Simple\EventDispatcher\EventSubscriberInterface;
 use Commty\Simple\Exception\ConfigureApplicationException;
 use Commty\Simple\Handler\ApplicationEventHandler;
-use Commty\Simple\Handler\ExceptionEventHandler;
 use Commty\Simple\Http\HttpEvent;
-use Commty\Simple\Http\Request;
+use Commty\Simple\Http\ResponseEvent;
 use Commty\Simple\Http\Router;
 use Commty\Simple\ServiceProvider\ServiceProviderInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class Application
@@ -47,7 +48,6 @@ class Application
      * @var array
      */
     protected $defaultSubscribers = [
-        'exceptionEventHandler' => ExceptionEventHandler::class,
         'applicationEventHandler' => ApplicationEventHandler::class
     ];
 
@@ -81,10 +81,23 @@ class Application
 
     /**
      * Run Application
+     * @param  Request|null  $request
      */
-    public function run()
+    public function run($request = null)
     {
-        $this->router->math(new Request());
+        if ($request === null) {
+            $request = Request::createFromGlobals();
+        }
+        $this->container->setInstance(Request::class, $request);
+        $response = $this->router->math($request);
+        if ($response instanceof Response) {
+            $this->dispatcher->dispatch(
+                ApplicationEventHandler::ENDAPPLICATION,
+                new ResponseEvent($response)
+            );
+        } else {
+            echo (string)$response;
+        }
     }
 
     /**
@@ -93,7 +106,7 @@ class Application
     public function exceptionHandler($exception)
     {
         $this->dispatcher->dispatch(
-            ExceptionEventHandler::EXCEPTION,
+            ApplicationEventHandler::EXCEPTION,
             new HttpEvent($exception, $this->router->getErrorCallback())
         );
     }
@@ -123,7 +136,7 @@ class Application
                 ));
             }
 
-            $this->container->set($key, $properties);
+            $this->container->setClass($key, $properties);
         }
     }
 
@@ -136,7 +149,7 @@ class Application
         $subscribers = array_unique(array_merge($this->defaultSubscribers, $subscribers));
         foreach ($subscribers as $key => $subscriber) {
             /** @var $subscriberInstance EventSubscriberInterface */
-            $subscriberInstance = $this->container->set($key, [$subscriber]);
+            $subscriberInstance = $this->container->setClass($key, [$subscriber]);
             $this->dispatcher->addSubscriber($subscriberInstance);
         }
     }
