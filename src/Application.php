@@ -124,7 +124,7 @@ class Application
 
         if (array_key_exists('providers', $config)) {
             foreach ($config['providers'] as $provider) {
-                $this->register($provider);
+                $this->register(new $provider);
             }
             unset($config['providers']);
         }
