@@ -163,6 +163,7 @@ class Application
     }
 
     /**
+     * Get the base path for the application.
      * @return string
      */
     public function getBasePath()
@@ -172,5 +173,16 @@ class Application
         }
 
         return $this->basePath;
+    }
+
+    /**
+     * Get the storage path for the application.
+     *
+     * @param  string|null  $path
+     * @return string
+     */
+    public function getStoragePath($path = null)
+    {
+        return $this->getBasePath().'/storage'.($path ? '/'.$path : $path);
     }
 }
