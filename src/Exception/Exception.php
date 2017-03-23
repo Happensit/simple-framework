@@ -3,10 +3,10 @@
 namespace Commty\Simple\Exception;
 
 /**
- * Class DatabaseException
+ * Class Exception
  * @package commty\Exception
  */
-class DatabaseException extends \Exception implements ApiExceptionInterface
+class Exception extends \Exception implements ApiExceptionInterface
 {
     /**
      * @var int

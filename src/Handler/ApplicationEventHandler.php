@@ -43,6 +43,7 @@ class ApplicationEventHandler implements EventSubscriberInterface
      */
     public function onKernelResponse(ResponseEvent $event)
     {
+        $response =  $event->getResponse()->headers->set('X-Powered-By', 'Commty Simple framework');
         return $event->getResponse()->send();
     }
 }

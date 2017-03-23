@@ -128,7 +128,6 @@ class JsonResponse extends Response
      */
     public function setData($data = array())
     {
-
         try {
             $data = json_encode($data, $this->encodingOptions);
         } catch (\Exception $e) {

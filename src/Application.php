@@ -5,7 +5,9 @@ namespace Commty\Simple;
 use Commty\Simple\Di\Container;
 use Commty\Simple\EventDispatcher\EventDispatcher;
 use Commty\Simple\EventDispatcher\EventSubscriberInterface;
+use Commty\Simple\Exception\ApiExceptionInterface;
 use Commty\Simple\Exception\ConfigureApplicationException;
+use Commty\Simple\Exception\Exception;
 use Commty\Simple\Handler\ApplicationEventHandler;
 use Commty\Simple\Http\HttpEvent;
 use Commty\Simple\Http\Request;
@@ -42,7 +44,7 @@ class Application
     /**
      * @var string
      */
-    protected $rootDir;
+    protected $basePath;
 
     /**
      * @var array
@@ -56,12 +58,13 @@ class Application
      * @param $environment
      * @param array $config
      */
-    public function __construct($environment, $config = [])
+    public function __construct($environment, $basePath = null, $config = [])
     {
         if ($environment === 'prod') {
             set_exception_handler([$this, 'exceptionHandler']);
         }
 
+        $this->basePath = $basePath;
         $this->environment = $environment;
         $this->container = Container::getInstance();
         $this->router = new Router();
@@ -102,10 +105,14 @@ class Application
     }
 
     /**
-     * @param $exception
+     * @param Exception $exception
      */
     public function exceptionHandler($exception)
     {
+        if (!$exception instanceof ApiExceptionInterface) {
+            $exception = new Exception($exception->getMessage());
+        }
+
         $this->dispatcher->dispatch(
             ApplicationEventHandler::EXCEPTION,
             new HttpEvent($exception, $this->router->getErrorCallback())
@@ -158,12 +165,12 @@ class Application
     /**
      * @return string
      */
-    public function getRootDir()
+    public function getBasePath()
     {
-        if (null === $this->rootDir) {
-            $this->rootDir = dirname(getcwd());
+        if ($this->basePath === null) {
+            $this->basePath = dirname(getcwd());
         }
 
-        return $this->rootDir;
+        return $this->basePath;
     }
 }
