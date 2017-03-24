@@ -2,7 +2,7 @@
 
 namespace Commty\Simple\Http;
 
-use Commty\Simple\Di\Container;
+use Commty\Simple\Di\ContainerInterface;
 use Commty\Simple\Exception\BadMethodCallException;
 use Commty\Simple\Exception\NotFoundHttpException;
 
@@ -12,6 +12,11 @@ use Commty\Simple\Exception\NotFoundHttpException;
  */
 class Router
 {
+    /**
+     * @var ContainerInterface
+     */
+    private $container;
+
     /**
      * @var array
      */
@@ -23,13 +28,22 @@ class Router
     private $errorCallback;
 
     /**
+     * Router constructor.
+     * @param ContainerInterface $container
+     */
+    function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
+
+    /**
      * @param $path
      * @param $action
      * @internal param $callback
      */
     public function get($path, $action)
     {
-        $this->add('GET', $path, $action);
+        $this->add(['GET', 'HEAD'], $path, $action);
     }
 
     /**
@@ -88,6 +102,22 @@ class Router
     }
 
     /**
+     *
+     * $app->router->match(['get', 'post'], '/', function () {
+     *   return 'Hello World';
+     *   });
+     *
+     * @param $methods
+     * @param $uri
+     * @param $action
+     * @return mixed
+     */
+    public function match($methods, $uri, $action)
+    {
+        return $this->addRoute(array_map('strtoupper', (array) $methods), $uri, $action);
+    }
+
+    /**
      * Error handler
      * @param $callback callable
      */
@@ -130,14 +160,14 @@ class Router
      */
     public function math(Request $request)
     {
-        if (array_key_exists($request->getMethod(), $this->routes) === false) {
+        list($method, $pathInfo) = $this->parseIncomingRequest($request);
+
+        if (array_key_exists($method, $this->routes) === false) {
             throw new BadMethodCallException("Method is not allowed");
         }
 
-        $requestUri = $request->getRequestUri();
-
-        foreach ($this->routes[$request->getMethod()] as $route) {
-            if (preg_match($route['path'], $requestUri, $params)) {
+        foreach ($this->routes[$method] as $route) {
+            if (preg_match($route['path'], $pathInfo, $params)) {
                 $params = array_slice($params, 1);
                 $callback = $route['callback'];
 
@@ -145,8 +175,8 @@ class Router
                     return call_user_func_array($callback, $params);
                 } elseif (stripos($callback, '@') !== false) {
                     list($controller, $method) = explode('@', $callback);
-                    $controller = Container::getInstance()->getClass($controller);
-                    $dependencies = Container::getInstance()->getDependencies(
+                    $controller = $this->container->getClass($controller);
+                    $dependencies = $this->container->getDependencies(
                         new \ReflectionMethod($controller, $method)
                     );
 
@@ -155,6 +185,18 @@ class Router
             }
         }
 
-        throw new NotFoundHttpException(sprintf("Route %s Not found", $requestUri));
+        throw new NotFoundHttpException(sprintf("Route %s Not found", $pathInfo));
+    }
+
+
+    /**
+     * Parse the incoming request and return the method and path info.
+     *
+     * @param  \Symfony\Component\HttpFoundation\Request $request
+     * @return array
+     */
+    protected function parseIncomingRequest($request)
+    {
+        return [$request->getMethod(), $request->getPathInfo()];
     }
 }

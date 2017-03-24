@@ -10,12 +10,14 @@ interface ContainerInterface
 {
     /**
      * @param $className
+     * @param $instance Object
+     * @return object
+     */
+    public function setClass($className, $instance);
+
+    /**
+     * @param $className
      * @return object
      */
     public function getClass($className);
-
-    /**
-     * @return Container
-     */
-    public static function getInstance();
 }

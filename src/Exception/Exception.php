@@ -11,10 +11,10 @@ class Exception extends \Exception implements ApiExceptionInterface
     /**
      * @var int
      */
-    private $statusCode;
+    public $statusCode;
 
     /**
-     * DatabaseException constructor.
+     * Exception constructor.
      * @param null $message
      * @param int $statusCode
      */

@@ -10,27 +10,9 @@ class Container implements ContainerInterface
 {
 
     /**
-     * @var Container
-     */
-    protected static $instance;
-    /**
      * @var array
      */
     protected $classes = [];
-
-    /**
-     * Set the globally available instance of the container.
-     *
-     * @return static
-     */
-    public static function getInstance()
-    {
-        if (is_null(static::$instance)) {
-            static::$instance = new static();
-        }
-
-        return static::$instance;
-    }
 
     /**
      * @param $className
@@ -39,7 +21,6 @@ class Container implements ContainerInterface
      */
     public function getClass($className, $dependencies = [])
     {
-
         if (isset($this->classes[$className])) {
             return $this->classes[$className];
         }
@@ -76,23 +57,17 @@ class Container implements ContainerInterface
     }
 
     /**
-     * Register an existing instance as shared in the container.
-     * @param $class
-     * @param $instance
-     */
-    public function setInstance($class, $instance)
-    {
-        unset($this->classes[$class]);
-        $this->classes[$class] = $instance;
-    }
-
-    /**
      * @param $class
      * @param array $definition
      * @return object
      */
     public function setClass($class, $definition = [])
     {
+        if (is_object($class)) {
+            unset($this->classes[get_class($class)]);
+            return $this->classes[get_class($class)] = $class;
+        }
+
         if (empty($definition)) {
             return $this->getClass($class);
         }

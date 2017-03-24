@@ -66,9 +66,10 @@ class Application
 
         $this->basePath = $basePath;
         $this->environment = $environment;
-        $this->container = Container::getInstance();
-        $this->router = new Router();
+        $this->container = new Container();
+        $this->router = new Router($this->container);
         $this->preInit($config);
+
     }
 
     /**
@@ -91,10 +92,12 @@ class Application
         if ($request === null) {
             $request = Request::createFromGlobals();
         }
-        $this->container->setInstance(Request::class, $request);
+
+        $this->container->setClass($request);
         $response = $this->router->math($request);
 
         if ($response instanceof Response) {
+            $response->prepare($request);
             $this->dispatcher->dispatch(
                 ApplicationEventHandler::ENDAPPLICATION,
                 new ResponseEvent($response)
