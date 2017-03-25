@@ -94,7 +94,7 @@ class Application
         }
 
         $this->container->setClass($request);
-        $response = $this->router->math($request);
+        $response = $this->router->matchRoute($request);
 
         if ($response instanceof Response) {
             $response->prepare($request);
