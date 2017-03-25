@@ -157,7 +157,7 @@ class Router
      * @throws BadMethodCallException
      * @throws NotFoundHttpException
      */
-    public function matchRoute(Request $request)
+    public function routeMatch(Request $request)
     {
         list($method, $pathInfo) = $this->parseIncomingRequest($request);
 
