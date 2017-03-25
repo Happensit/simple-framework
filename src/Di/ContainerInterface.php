@@ -20,4 +20,10 @@ interface ContainerInterface
      * @return object
      */
     public function getClass($className);
+
+    /**
+     * @param $reflection
+     * @return array
+     */
+    public function getDependencies($reflection);
 }

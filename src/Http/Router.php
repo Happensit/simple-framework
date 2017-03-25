@@ -31,7 +31,7 @@ class Router
      * Router constructor.
      * @param ContainerInterface $container
      */
-    function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
     }
@@ -107,14 +107,13 @@ class Router
      *   return 'Hello World';
      *   });
      *
-     * @param $methods
-     * @param $uri
-     * @param $action
-     * @return mixed
+     * @param array $methods
+     * @param string $uri
+     * @param mixed $action
      */
     public function match($methods, $uri, $action)
     {
-        return $this->addRoute(array_map('strtoupper', (array) $methods), $uri, $action);
+        $this->add(array_map('strtoupper', (array) $methods), $uri, $action);
     }
 
     /**
